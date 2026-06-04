@@ -702,6 +702,62 @@
       display: block;
     }
 
+    .tab-carousel {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: 0 20px 56px rgba(0,0,0,0.14);
+    }
+    .tab-carousel-track {
+      display: flex;
+      transition: transform 0.4s ease;
+    }
+    .tab-carousel-track img {
+      min-width: 100%;
+      box-shadow: none;
+      border-radius: 0;
+    }
+    .tab-carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.85);
+      border: none;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      transition: background 0.2s;
+      z-index: 2;
+    }
+    .tab-carousel-btn:hover { background: #fff; }
+    .tab-carousel-btn.prev { left: 10px; }
+    .tab-carousel-btn.next { right: 10px; }
+    .tab-carousel-dots {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 7px;
+      z-index: 2;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.6);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .dot.active { background: #fff; }
+
     /* ===== EN ACCION ===== */
     #en-accion {
       padding: 96px 0 80px;
@@ -1647,7 +1703,18 @@
           </a>
         </div>
         <div class="tab-right">
-          <img src="assets/images/producto-7.jpg" alt="Tape sellador y masking tape Guatemala" loading="lazy" />
+          <div class="tab-carousel" id="tape-carousel">
+            <div class="tab-carousel-track">
+              <img src="assets/images/tape-1.jpg" alt="Tape sellador Guatemala" loading="lazy" />
+              <img src="assets/images/tape-2.jpg" alt="Masking tape Guatemala" loading="lazy" />
+            </div>
+            <button class="tab-carousel-btn prev" onclick="moveCarousel('tape-carousel',-1)" aria-label="Anterior">&#8249;</button>
+            <button class="tab-carousel-btn next" onclick="moveCarousel('tape-carousel',1)" aria-label="Siguiente">&#8250;</button>
+            <div class="tab-carousel-dots" id="tape-carousel-dots">
+              <span class="dot active" onclick="goToSlide('tape-carousel',0)"></span>
+              <span class="dot" onclick="goToSlide('tape-carousel',1)"></span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2174,6 +2241,27 @@
     setTimeout(() => {
       document.getElementById('formSuccess').style.display = 'block';
     }, 800);
+  }
+
+  // Carousel
+  const carouselState = {};
+  function moveCarousel(id, dir) {
+    const c = document.getElementById(id);
+    const imgs = c.querySelectorAll('.tab-carousel-track img');
+    if (!carouselState[id]) carouselState[id] = 0;
+    carouselState[id] = (carouselState[id] + dir + imgs.length) % imgs.length;
+    c.querySelector('.tab-carousel-track').style.transform = `translateX(-${carouselState[id] * 100}%)`;
+    updateDots(id, carouselState[id]);
+  }
+  function goToSlide(id, idx) {
+    const c = document.getElementById(id);
+    carouselState[id] = idx;
+    c.querySelector('.tab-carousel-track').style.transform = `translateX(-${idx * 100}%)`;
+    updateDots(id, idx);
+  }
+  function updateDots(id, idx) {
+    const dots = document.querySelectorAll(`#${id}-dots .dot`);
+    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
   }
 </script>
 
